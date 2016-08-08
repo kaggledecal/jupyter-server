@@ -34,5 +34,8 @@ Template.dockerStuff.events({
 Template.dockerStuff.helpers({
 	instanceId (){
 		return Template.instance().instanceId.get();
+	},
+	notebookLink(){
+		return 'localhost:8888';
 	}
 });
