@@ -13,5 +13,14 @@ Meteor.methods({
 		} catch (e) {
 			throw new Meteor.Error(500,e);
 		}
-	}
+	},
+	'stopNotebook'(instanceId){
+		const command = 'docker kill ' + instanceId;
+		const cmd = Meteor.wrapAsync(exec);
+		try {
+			return cmd(command);
+		} catch (e) {
+			throw new Meteor.Error(500,e);
+		}
+	},
 });

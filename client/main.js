@@ -18,6 +18,16 @@ Template.dockerStuff.events({
 				templateInstance.instanceId.set(res);
 			}
 		});
+	},
+	'click button.stop'(){
+		const templateInstance = Template.instance();
+		Meteor.call('stopNotebook',templateInstance.instanceId.get(),(err, res)=>{
+			if(err){
+				console.log(err);
+			} else {
+				templateInstance.instanceId.set('-1');
+			}
+		});
 	}
 });
 
