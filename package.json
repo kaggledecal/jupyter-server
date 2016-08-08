@@ -1,0 +1,11 @@
+{
+  "name": "jupyter-server",
+  "private": true,
+  "scripts": {
+    "start": "meteor run"
+  },
+  "dependencies": {
+    "dockerode": "^2.3.0",
+    "meteor-node-stubs": "^0.2.3"
+  }
+}
