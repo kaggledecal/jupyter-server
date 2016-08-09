@@ -4,51 +4,55 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import './main.html';
 
 Template.dockerStuff.onCreated(() => {
-	Template.instance().instanceId = new ReactiveVar('-1');
-	Template.instance().imageList = new ReactiveVar([]);
+	Template.instance().containerId = new ReactiveVar('-1');
+	Template.instance().containerList = new ReactiveVar([]);
 });
 
 Template.dockerStuff.events({
 	'click button.start'(){
 		const templateInstance = Template.instance();
-		Meteor.call('startNotebook','',(err, res)=>{
+		Meteor.call('startNotebook',templateInstance.containerId.get(),(err, res)=>{
 			if(err){
 				console.log(err);
-			} else {
-				templateInstance.instanceId.set(res);
 			}
 		});
 	},
 	'click button.stop'(){
 		const templateInstance = Template.instance();
-		Meteor.call('stopNotebook',templateInstance.instanceId.get(),(err, res)=>{
+		Meteor.call('stopNotebook',templateInstance.containerId.get(),(err, res)=>{
 			if(err){
 				console.log(err);
-			} else {
-				templateInstance.instanceId.set('-1');
 			}
 		});
 	},
-	'click button.getImageList'(){
+	'click button.getContainerList'(){
 		const templateInstance = Template.instance();
-		Meteor.call('getImageList',{},(err, res)=>{
+		Meteor.call('getContainerList',{},(err, res)=>{
+			console.log(res.data);
 			if(err){
 				console.log(err);
 			} else {
-				templateInstance.imageList.set(res.data);
+				templateInstance.containerList.set(res.data);
 			}
 		});
+	},
+	'change select.containerSelect'(e,t) {
+		const templateInstance = Template.instance();		
+		templateInstance.containerId.set(e.currentTarget.value);
 	}
 });
 
 Template.dockerStuff.helpers({
-	instanceId (){
-		return Template.instance().instanceId.get();
+	containerId (){
+		return Template.instance().containerId.get();
+	},
+	containerName(){
+	
 	},
 	notebookLink(){
 		return 'localhost:8888';
 	},
-	imageList(){
-		return Template.instance().imageList.get();
+	containerList(){
+		return Template.instance().containerList.get();
 	}
 });

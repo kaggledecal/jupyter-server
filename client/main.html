@@ -8,11 +8,13 @@
 
 <template name="dockerStuff">
 	<button class="start">Start notebook</button>
-	<span>Instance id: {{instanceId}}</span>
+	<span>Container id: {{containerId}}</span>
 	<button class="stop">Stop notebook</button>
-	<button class="getImageList">Get image list</button>
+	<button class="getContainerList">Get container list</button>
 	<a href="{{notebookLink}}">{{notebookLink}}</a>
-	{{#each imageList}}
-		Id: {{Id}}
-	{{/each}}
+	<select class="containerSelect">
+		{{#each containerList}}
+			<option value="{{Id}}">{{Names}}</option>
+		{{/each}}
+	</select>
 </template>
