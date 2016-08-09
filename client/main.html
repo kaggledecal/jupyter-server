@@ -10,5 +10,9 @@
 	<button class="start">Start notebook</button>
 	<span>Instance id: {{instanceId}}</span>
 	<button class="stop">Stop notebook</button>
+	<button class="getImageList">Get image list</button>
 	<a href="{{notebookLink}}">{{notebookLink}}</a>
+	{{#each imageList}}
+		Id: {{Id}}
+	{{/each}}
 </template>

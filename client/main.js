@@ -1,11 +1,11 @@
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
-import dockerode from 'dockerode';
 
 import './main.html';
 
 Template.dockerStuff.onCreated(() => {
 	Template.instance().instanceId = new ReactiveVar('-1');
+	Template.instance().imageList = new ReactiveVar([]);
 });
 
 Template.dockerStuff.events({
@@ -28,6 +28,16 @@ Template.dockerStuff.events({
 				templateInstance.instanceId.set('-1');
 			}
 		});
+	},
+	'click button.getImageList'(){
+		const templateInstance = Template.instance();
+		Meteor.call('getImageList',{},(err, res)=>{
+			if(err){
+				console.log(err);
+			} else {
+				templateInstance.imageList.set(res.data);
+			}
+		});
 	}
 });
 
@@ -37,5 +47,8 @@ Template.dockerStuff.helpers({
 	},
 	notebookLink(){
 		return 'localhost:8888';
+	},
+	imageList(){
+		return Template.instance().imageList.get();
 	}
 });
