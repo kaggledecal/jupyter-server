@@ -12,7 +12,7 @@
 ## Setting up docker instance
 
 1. [Install docker](https://docs.docker.com/installation/)
-2. Configure vagrant port forwarding 4243:4243
+2. Configure vagrant port forwarding 4342:4342
 3. Configure docker rest port
 	* See [this](http://www.campalus.com/enable-remote-tcp-connections-to-docker-host-running-ubuntu-15-04/)
 4. [Install data science docker container](https://github.com/jupyter/docker-stacks/tree/master/datascience-notebook)
