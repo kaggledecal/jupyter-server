@@ -1,71 +1,75 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
+# {{project_name}} vagrant configuration
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
-Vagrant.configure(2) do |config|
-  # The most common configuration options are documented and commented below.
-  # For a complete reference, please see the online documentation at
-  # https://docs.vagrantup.com.
+# Loop through configuration possibilities 
+boxname = 'bento/ubuntu-14.04' 
+ram = 512 
+cpus = 1
+base_ip = '172.16.1.'
+nodes = Array.new
+names=['docker-server']
+names.each_with_index do |name, i|
+    node = Hash.new
+    node[:box] = boxname
+    node[:ram] = ram
+    node[:cpus] = cpus
+    node[:hostname] = name
+    node[:ip] = base_ip + (i + 2).to_s
+    nodes.push(node)
+end
 
-  # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "bento/ubuntu-14.04"
+# BEGIN Vagrantfile
+Vagrant.configure("2") do |config|
+  config.ssh.insert_key = false
 
-  # Disable automatic box update checking. If you disable this, then
-  # boxes will only be checked for updates when the user runs
-  # `vagrant box outdated`. This is not recommended.
-  # config.vm.box_check_update = false
+  if Vagrant.has_plugin?('vagrant-cachier')
+    config.cache.enable :apt
+  else
+    printf("** Install vagrant-cachier plugin to speedup deploy: `vagrant plugin install vagrant-cachier`.**\n")
+  end
 
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:4342" will access port 4342 on the guest machine.
-  # config.vm.network "forwarded_port", guest: 4342, host: 4342
+  # If hostmanager plugin is not installed, tell the user to install it.
+  # We require hostmanager; our inventory files assume you have it working. Hostmanager may cause
+  # difficulties with automated install, but there are directions for getting around that here:
+  #   https://github.com/smdahlen/vagrant-hostmanager#passwordless-sudo
+  if not Vagrant.has_plugin?('vagrant-hostmanager')
+    raise "** Install vagrant-hostmanager plugin to continue: `vagrant plugin install vagrant-hostmanager`.**\n"
+  end
 
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.33.10"
+  # Use the hostmanager plugin. Hostmanager makes it convenient to access vagrant-managed hosts by
+  # name instead of by IP address. It's especially useful if we want to connect to a service on the
+  # virtual box via HTTPS.
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.include_offline = true
 
-  # Create a public network, which generally matched to bridged network.
-  # Bridged networks make the machine appear as another physical device on
-  # your network.
-  # config.vm.network "public_network"
+  # https://github.com/smdahlen/vagrant-hostmanager/issues/86
+  cached_addresses = {}
+  config.hostmanager.ip_resolver = proc do |vm, resolving_vm|
+    if cached_addresses[vm.name].nil?
+      if hostname = (vm.ssh_info && vm.ssh_info[:host])
+        vm.communicate.execute("ip -f inet -o addr show eth1") do |type, contents|
+          cached_addresses[vm.name] = contents.split()[3][/[^\/]+/]
+        end
+      end
+    end
+    cached_addresses[vm.name]
+  end
 
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  # config.vm.synced_folder "../data", "/vagrant_data"
-
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
-
-  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
-  # such as FTP and Heroku are also available. See the documentation at
-  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
-  # config.push.define "atlas" do |push|
-  #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
-  # end
-
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-  # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   sudo apt-get update
-  #   sudo apt-get install -y apache2
-  # SHELL
+  nodes.each do |node|
+    config.vm.define node[:hostname] do |node_config|
+      node_config.vm.box = node[:box]
+      node_config.vm.host_name = node[:hostname]
+      node_config.vm.network :private_network, ip: node[:ip]
+      node_config.vm.provider :virtualbox do |vb|
+        vb.memory = node[:ram]
+        vb.cpus = node[:cpus]
+        vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        vb.customize ['guestproperty', 'set', :id, '/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold', 10000]
+      end
+      node_config.vm.provider "vmware_fusion" do |vb|
+        vb.vmx["memsize"] = node[:ram]
+        vb.vmx["numvcpus"] = node[:cpus]
+      end
+    end
+  end
 end
