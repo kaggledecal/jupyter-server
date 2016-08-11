@@ -39,7 +39,18 @@ Template.dockerStuff.events({
 			getContainerList(templateInstance);
 		});
 	},
-	'click button.getContainerList':getContainerList,
+	'click button.createContainer'(){
+		const templateInstance = Template.instance();
+		Meteor.call('createContainer',{},(err, res)=>{
+			if(err){
+				console.log(err);
+			}
+			getContainerList(templateInstance);
+		});
+	},
+	'click button.getContainerList'(){
+		getContainerList(Template.instance());
+	},
 });
 
 Template.dockerStuff.helpers({
