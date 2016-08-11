@@ -6,6 +6,17 @@ import './main.html';
 Template.dockerStuff.onCreated(() => {
 	Template.instance().containerId = new ReactiveVar('-1');
 	Template.instance().containerList = new ReactiveVar([]);
+	Template.instance().currentContainer = new ReactiveVar('');
+	const templateInstance = Template.instance();
+
+	Meteor.call('getContainerList', {}, (err,res) => {
+		if(err){
+			console.log(err);
+		} else {
+			templateInstance.containerList.set(res.data);
+			templateInstance.currentContainer.set(res.data[0]);
+		}
+	});
 });
 
 Template.dockerStuff.events({
@@ -44,7 +55,7 @@ Template.dockerStuff.events({
 
 Template.dockerStuff.helpers({
 	containerId (){
-		return Template.instance().containerId.get();
+		return Template.instance().currentContainer.get().Id;
 	},
 	containerName(){
 	
