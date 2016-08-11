@@ -39,6 +39,15 @@ Template.dockerStuff.events({
 			getContainerList(templateInstance);
 		});
 	},
+	'click button.remove'(){
+		const templateInstance = Template.instance();
+		Meteor.call('removeContainer',this.Id,(err, res)=>{
+			if(err){
+				console.log(err);
+			}
+			getContainerList(templateInstance);
+		});
+	},
 	'click button.createContainer'(){
 		const templateInstance = Template.instance();
 		Meteor.call('createContainer',{},(err, res)=>{

@@ -61,5 +61,13 @@ Meteor.methods({
 			throw new Meteor.Error(500,e);
 		}
 
+	},
+	'removeContainer'(containerId){
+		try {
+			return HTTP.call('DELETE', 'http://docker-server:4243/containers/' + containerId, {});
+		} catch (e) {
+			console.log(e);
+			throw new Meteor.Error(500,e);
+		}
 	}
 });
