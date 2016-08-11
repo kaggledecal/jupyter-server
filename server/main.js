@@ -8,22 +8,25 @@ Meteor.startup(() => {
 Meteor.methods({
 	'startNotebook'(containerId){
 		try {
-			return HTTP.call('POST', 'http://localhost:4342/containers/' + containerId + '/start', {});
+			return HTTP.call('POST', 'http://docker-server:4243/containers/' + containerId + '/start', {});
 		} catch (e) {
+			console.log(e);
 			throw new Meteor.Error(500,e);
 		}
 	},
 	'stopNotebook'(containerId){
 		try {
-			return HTTP.call('POST', 'http://localhost:4342/containers/' + containerId + '/stop', {});
+			return HTTP.call('POST', 'http://docker-server:4243/containers/' + containerId + '/stop', {});
 		} catch (e) {
+			console.log(e);
 			throw new Meteor.Error(500,e);
 		}
 	},
 	'getContainerList'(){
 		try {
-			return HTTP.call('GET', 'http://localhost:4342/containers/json?all=true', {});
+			return HTTP.call('GET', 'http://docker-server:4243/containers/json?all=true', {});
 		} catch (e) {
+			console.log(e);
 			throw new Meteor.Error(500,e);
 		}
 

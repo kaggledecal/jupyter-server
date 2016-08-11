@@ -7,14 +7,18 @@
 </body>
 
 <template name="dockerStuff">
-	<button class="start">Start notebook</button>
-	<span>Container id: {{containerId}}</span>
-	<button class="stop">Stop notebook</button>
 	<button class="getContainerList">Get container list</button>
-	<a href="{{notebookLink}}">{{notebookLink}}</a>
-	<select class="containerSelect">
+	<ul>
 		{{#each containerList}}
-			<option value="{{Id}}">{{Names}}</option>
+			<li>
+				<span>{{Names}}</span>
+				<span>{{shortenId}}</span>
+				{{#if isRunning}}
+					<button class="stop">Stop container</button>
+				{{else}}
+					<button class="start">Start container</button>	
+				{{/if}}
+			</li>
 		{{/each}}
-	</select>
+	</ul>
 </template>

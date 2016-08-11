@@ -4,59 +4,45 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import './main.html';
 
 Template.dockerStuff.onCreated(() => {
-	Template.instance().containerId = new ReactiveVar('-1');
 	Template.instance().containerList = new ReactiveVar([]);
-	Template.instance().currentContainer = new ReactiveVar('');
-	const templateInstance = Template.instance();
+	getContainerList(Template.instance());
+});
 
-	Meteor.call('getContainerList', {}, (err,res) => {
+function getContainerList(templateInstance) {
+	Meteor.call('getContainerList',{},(err, res)=>{
+		console.log(res.data);
 		if(err){
 			console.log(err);
 		} else {
 			templateInstance.containerList.set(res.data);
-			templateInstance.currentContainer.set(res.data[0]);
 		}
 	});
-});
+
+}
 
 Template.dockerStuff.events({
 	'click button.start'(){
 		const templateInstance = Template.instance();
-		Meteor.call('startNotebook',templateInstance.containerId.get(),(err, res)=>{
+		Meteor.call('startNotebook',this.Id,(err, res)=>{
 			if(err){
 				console.log(err);
 			}
+			getContainerList(templateInstance);
 		});
 	},
 	'click button.stop'(){
 		const templateInstance = Template.instance();
-		Meteor.call('stopNotebook',templateInstance.containerId.get(),(err, res)=>{
+		Meteor.call('stopNotebook',this.Id,(err, res)=>{
 			if(err){
 				console.log(err);
 			}
+			getContainerList(templateInstance);
 		});
 	},
-	'click button.getContainerList'(){
-		const templateInstance = Template.instance();
-		Meteor.call('getContainerList',{},(err, res)=>{
-			console.log(res.data);
-			if(err){
-				console.log(err);
-			} else {
-				templateInstance.containerList.set(res.data);
-			}
-		});
-	},
-	'change select.containerSelect'(e,t) {
-		const templateInstance = Template.instance();		
-		templateInstance.containerId.set(e.currentTarget.value);
-	}
+	'click button.getContainerList':getContainerList,
 });
 
 Template.dockerStuff.helpers({
-	containerId (){
-		return Template.instance().currentContainer.get().Id;
-	},
 	containerName(){
 	
 	},
@@ -65,5 +51,11 @@ Template.dockerStuff.helpers({
 	},
 	containerList(){
 		return Template.instance().containerList.get();
+	},
+	shortenId(){
+		return this.Id.slice(0,12);
+	},
+	isRunning() {
+		return this.State === "running";
 	}
 });
