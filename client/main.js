@@ -67,7 +67,7 @@ Template.dockerStuff.helpers({
 	
 	},
 	notebookLink(){
-		return 'localhost:8888';
+		return 'docker-server:' + this.Ports[0].PublicPort;
 	},
 	containerList(){
 		return Template.instance().containerList.get();
