@@ -1,0 +1,4 @@
+[docker-host]
+docker-server
+[vagrant:children]
+docker-host

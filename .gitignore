@@ -1,4 +1,6 @@
 node_modules/
+shared_roles/
+
 *.swp
 .vagrant
 *.log
