@@ -1,6 +1,7 @@
 ---
 
 - name: Install docker
-  hosts: servers
+  become: true
+  hosts: all 
   roles:
    - { role: docker, tags: ['docker'] }
