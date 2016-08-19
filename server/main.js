@@ -10,8 +10,10 @@ Meteor.methods({
 	'startNotebook'(containerId){
 		try {
 			//const derp = '"PortBindings": { "8888/tcp": [{ "HostPort": "8000" }] }';
-			return HTTP.call('POST', 'http://docker-server:4243/containers/' + containerId + '/start', {
+			let ret = HTTP.call('POST', 'http://docker-server:4243/containers/' + containerId + '/start', {
 			});
+			console.log(ret);
+			return ret;
 		} catch (e) {
 			console.log(e);
 			throw new Meteor.Error(500,e);
@@ -51,10 +53,12 @@ Meteor.methods({
 					"HostConfig":{
 						"PortBindings": { "8888/tcp": [{ "HostPort": currentPort.toString() }] },
 						"PublishAllPorts": false,
-					}
+					},
+					"Entrypoint":["sh", "-c", "jupyter notebook --NotebookApp.base_url=/container  --NotebookApp.allow_origin=* --NotebookApp.ip=0.0.0.0"]
 				}
 			});
 			currentPort++;
+			console.log(returnValue);
 			return returnValue;
 		} catch (e) {
 			console.log(e);
