@@ -1,7 +1,17 @@
 ---
-
 - name: Install docker
-  become: true
   hosts: all 
   roles:
-   - { role: docker, tags: ['docker'] }
+    - { role: docker, tags: ['docker'] }
+
+- name: Start scipy notebook container
+  hosts: docker-host
+  tasks:
+    - docker_container:
+        name: scipynotebook
+        image: jupyter/scipy-notebook
+        state: present
+        exposed_ports:
+          - 8888
+        # volumes_from:
+        #   - mydata
