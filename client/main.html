@@ -7,7 +7,7 @@
 </body>
 
 <template name="dockerStuff">
-	<button class="createContainer">Create new container</button>	
+	<button class="createContainer">Create new container</button>
 	<button class="getContainerList">Get container list</button>
 	<ul>
 		{{#each containerList}}
@@ -15,11 +15,11 @@
 				<span>{{Names}}</span>
 				<span>{{shortenId}}</span>
 				{{#if isRunning}}
-					<a href="{{notebookLink}}">{{notebookLink}}</a>
+					<a href="http://{{notebookLink}}">{{notebookLink}}</a>
 					<button class="stop">Stop container</button>
 				{{else}}
 					<button class="start">Start container</button>
-					<button class="remove">Remove container</button>					
+					<button class="remove">Remove container</button>
 				{{/if}}
 			</li>
 		{{/each}}
