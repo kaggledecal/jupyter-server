@@ -5,12 +5,15 @@ import {HTTP} from 'meteor/http';
 Meteor.startup(() => {
 	currentPort = 8000;
 });
-
+var dockerHost = 'docker-server'
+var dockerPort = '4243'
+var dockerBaseUrl = 'http://' + dockerHost + ':' + dockerPort
+var containerUrl = dockerBaseUrl + '/containers'
 Meteor.methods({
 	'startNotebook'(containerId){
 		try {
 			//const derp = '"PortBindings": { "8888/tcp": [{ "HostPort": "8000" }] }';
-			let ret = HTTP.call('POST', 'http://docker-server:4243/containers/' + containerId + '/start', {
+            let ret = HTTP.call('POST', containerUrl + '/' + containerId + '/start', {
 			});
 			console.log(ret);
 			return ret;
@@ -21,7 +24,7 @@ Meteor.methods({
 	},
 	'stopNotebook'(containerId){
 		try {
-			return HTTP.call('POST', 'http://docker-server:4243/containers/' + containerId + '/stop', {});
+			return HTTP.call('POST', containerUrl + '/' + containerId + '/stop', {});
 		} catch (e) {
 			console.log(e);
 			throw new Meteor.Error(500,e);
@@ -29,7 +32,7 @@ Meteor.methods({
 	},
 	'getContainerList'(){
 		try {
-			return HTTP.call('GET', 'http://docker-server:4243/containers/json?all=true', {});
+			return HTTP.call('GET', containerUrl + '/json?all=true', {});
 		} catch (e) {
 			console.log(e);
 			throw new Meteor.Error(500,e);
@@ -38,7 +41,7 @@ Meteor.methods({
 	},
 	'createContainer'(){
 		try {
-			let returnValue = HTTP.call('POST', 'http://docker-server:4243/containers/create', {
+			let returnValue = HTTP.call('POST', containerUrl + '/create', {
 				data:{
 					"Image": "jupyter/scipy-notebook",
 					"AttachStdin": false,
@@ -53,12 +56,11 @@ Meteor.methods({
 					"HostConfig":{
 						"PortBindings": { "8888/tcp": [{ "HostPort": currentPort.toString() }] },
 						"PublishAllPorts": false,
-					},
+                    },
 					"Entrypoint":["sh", "-c", "jupyter notebook --NotebookApp.base_url=/container  --NotebookApp.allow_origin=* --NotebookApp.ip=0.0.0.0"]
 				}
 			});
 			currentPort++;
-			console.log(returnValue);
 			return returnValue;
 		} catch (e) {
 			console.log(e);
@@ -68,7 +70,7 @@ Meteor.methods({
 	},
 	'removeContainer'(containerId){
 		try {
-			return HTTP.call('DELETE', 'http://docker-server:4243/containers/' + containerId, {});
+			return HTTP.call('DELETE', containerUrl + '/' + containerId, {});
 		} catch (e) {
 			console.log(e);
 			throw new Meteor.Error(500,e);

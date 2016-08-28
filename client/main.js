@@ -3,6 +3,9 @@ import { ReactiveVar } from 'meteor/reactive-var';
 
 import './main.html';
 
+
+var dockerHost = 'docker-server'
+
 Template.dockerStuff.onCreated(() => {
 	Template.instance().containerList = new ReactiveVar([]);
 	getContainerList(Template.instance());
@@ -64,10 +67,10 @@ Template.dockerStuff.events({
 
 Template.dockerStuff.helpers({
 	containerName(){
-	
+
 	},
 	notebookLink(){
-		return 'docker-server:' + this.Ports[0].PublicPort;
+		return dockerHost + ':' + this.Ports[0].PublicPort;
 	},
 	containerList(){
 		return Template.instance().containerList.get();
