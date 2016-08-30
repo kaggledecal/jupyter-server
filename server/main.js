@@ -9,6 +9,45 @@ var dockerHost = 'docker-server'
 var dockerPort = '4243'
 var dockerBaseUrl = 'http://' + dockerHost + ':' + dockerPort
 var containerUrl = dockerBaseUrl + '/containers'
+
+
+/*
+Temporary functions that directly affect nginx from meteorjs
+
+Using containerId as the nginx configuration name
+Author: Phillip Kuznetsov
+*/
+function nginxBuild(port, containerId) {
+    /* Builds the nginx configuration for the particular container */
+    SSR.compileTemplate('nginxText', Assets.getText('nginx_template.txt'));
+    // check whether the file exists
+    // write to the file system
+    var fs = Npm.require('fs');
+    fs.writeFile('/etc/nginx/sites-available/' + containerId, SSR.render('nginxText', {port: port}),
+        function (err) {
+            if (err) throw err;
+            console.log('Done!');
+            nginxReload();
+    });
+}
+
+function nginxDestroy(containerId) {
+    /* Destroys the nginx configuration for the particular container */
+    // go into the file system and remove the nginx config with containerId
+}
+
+function nginxReload() {
+    /* Safely restarts nginx */
+
+}
+
+
+
+
+
+
+
+
 Meteor.methods({
 	'startNotebook'(containerId){
 		try {
@@ -60,6 +99,7 @@ Meteor.methods({
 					"Entrypoint":["sh", "-c", "jupyter notebook --NotebookApp.base_url=/container  --NotebookApp.allow_origin=* --NotebookApp.ip=0.0.0.0"]
 				}
 			});
+            nginxBuild(currentPort, containerId);
 			currentPort++;
 			return returnValue;
 		} catch (e) {
@@ -70,7 +110,9 @@ Meteor.methods({
 	},
 	'removeContainer'(containerId){
 		try {
-			return HTTP.call('DELETE', containerUrl + '/' + containerId, {});
+            let deleteResult = HTTP.call('DELETE', containerUrl + '/' + containerId, {});
+			nginxDestroy(containerId);
+            return deleteResult;
 		} catch (e) {
 			console.log(e);
 			throw new Meteor.Error(500,e);

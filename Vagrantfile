@@ -1,8 +1,8 @@
 # {{project_name}} vagrant configuration
 
-# Loop through configuration possibilities 
-boxname = 'bento/ubuntu-14.04' 
-ram = 512 
+# Loop through configuration possibilities
+boxname = 'bento/ubuntu-14.04'
+ram = 512
 cpus = 1
 base_ip = '172.16.1.'
 nodes = Array.new
@@ -59,6 +59,7 @@ Vagrant.configure("2") do |config|
     config.vm.define node[:hostname] do |node_config|
       node_config.vm.box = node[:box]
       node_config.vm.host_name = node[:hostname]
+      node_config.vm.synced_folder ".", "/vagrant", type: "nfs"
       node_config.vm.network :private_network, ip: node[:ip]
       node_config.vm.provider :virtualbox do |vb|
         vb.memory = node[:ram]
