@@ -23,12 +23,13 @@ function nginxBuild(port, containerId) {
     // check whether the file exists
     // write to the file system
     var fs = Npm.require('fs');
-    fs.writeFile('/etc/nginx/sites-available/' + containerId, SSR.render('nginxText', {port: port}),
+    fs.writeFile('/etc/nginx/sites-available/' + containerId,
+        SSR.render('nginxText', { port: port }),
         function (err) {
             if (err) throw err;
             console.log('Done!');
             nginxReload();
-    });
+        });
 }
 
 function nginxDestroy(containerId) {
@@ -40,13 +41,6 @@ function nginxReload() {
     /* Safely restarts nginx */
 
 }
-
-
-
-
-
-
-
 
 Meteor.methods({
 	'startNotebook'(containerId){
@@ -96,7 +90,7 @@ Meteor.methods({
 						"PortBindings": { "8888/tcp": [{ "HostPort": currentPort.toString() }] },
 						"PublishAllPorts": false,
                     },
-					"Entrypoint":["sh", "-c", "jupyter notebook --NotebookApp.base_url=/container  --NotebookApp.allow_origin=* --NotebookApp.ip=0.0.0.0"]
+					"Entrypoint":["sh", "-c", "jupyter notebook  --NotebookApp.allow_origin=* --NotebookApp.ip=0.0.0.0"]
 				}
 			});
             nginxBuild(currentPort, containerId);
