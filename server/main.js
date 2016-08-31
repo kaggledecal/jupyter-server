@@ -16,6 +16,7 @@ Meteor.methods({
             let ret = HTTP.call('POST', containerUrl + '/' + containerId + '/start', {
 			});
 			console.log(ret);
+
 			return ret;
 		} catch (e) {
 			console.log(e);

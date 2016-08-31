@@ -3,8 +3,8 @@ import { ReactiveVar } from 'meteor/reactive-var';
 
 import './main.html';
 
-
-var dockerHost = 'docker-server'
+//tODO make env variable
+const dockerHost = 'docker-server'
 
 Template.dockerStuff.onCreated(() => {
 	Template.instance().containerList = new ReactiveVar([]);
@@ -27,6 +27,8 @@ Template.dockerStuff.events({
 	'click button.start'(){
 		const templateInstance = Template.instance();
 		Meteor.call('startNotebook',this.Id,(err, res)=>{
+
+
 			if(err){
 				console.log(err);
 			}
@@ -70,6 +72,7 @@ Template.dockerStuff.helpers({
 
 	},
 	notebookLink(){
+
 		return dockerHost + ':' + this.Ports[0].PublicPort;
 	},
 	containerList(){
